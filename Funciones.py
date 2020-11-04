@@ -1,12 +1,10 @@
 import ifcopenshell as IfcOs
-import numpy as np
 import pandas as pd
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
-from PyQt5.QtCore import QAbstractTableModel, Qt
 import xlsxwriter as wr
 import datetime
 import time
 import getpass
+import os
 
 
 class ArchIfc:
@@ -25,33 +23,14 @@ class ArchIfc:
         dfInfo = pd.DataFrame.from_dict(info_mod, orient='index', columns=['Resumen'])
         return dfInfo
 
-    # def entidades(self, Ifc):
-    #     products = Ifc.by_type('IfcProduct')
-    #     productos = []
-    #     cant_enti = {}
-    #     for product in products:
-    #         productos.append(product.is_a())
-    #     ent_mod = np.unique(np.array(productos))
-    #     for ent in ent_mod:
-    #         cant = productos.count(ent)
-    #         cant_enti[ent] = cant
-    #     print(cant_enti)
-    #
-    #     instancia_info = {}
-    #     for product in products:
-    #         att = product.get_info()
-    #         instancia_info[product.is_a()] = (product.GlobalId, product.Name)
-    #     print(instancia_info)
-
     def crear_repo(self, Ifc):
         #Crear archivo xlsx base para el reporte
         info_resumen = []
         proy = Ifc.by_type('IfcProject')[0]
         reporte = wr.Workbook(proy.Name + '_reporte.xlsx')
-        r_portada = reporte.add_worksheet('Portada')
-        r_instruc = reporte.add_worksheet('Instrucciones')
-        r_resumen = reporte.add_worksheet('Resumen')
-
+        r_portada = reporte.add_worksheet('PORTADA')
+        r_instruc = reporte.add_worksheet('INSTRUCCIONES')
+        r_resumen = reporte.add_worksheet('RESUMEN')
         # Crear formatos para reporte
         fecha = datetime.date.today()
         t = time.localtime()
@@ -74,7 +53,7 @@ class ArchIfc:
         r_portada.set_column('A:A', 21)
         r_portada.set_column('B:B', 60)
         r_portada.write('B1', 'Reporte Modelo IFC', titulo)
-        r_portada.write('B2', 'Ifc a Xlsx - iX', subtitulo)
+        r_portada.write('B2', 'iX - Ifc a Xlsx', subtitulo)
         r_portada.write('B3', 'Usuario: ' + usuario, text_norm)
         r_portada.write('B4', 'Fecha: ' + str(fecha) + ' ' + str(hora), text_norm)
         r_portada.merge_range('A5:B5', None, fondo)
@@ -83,7 +62,7 @@ class ArchIfc:
         # Crear instrucciones reporte
         r_instruc.set_column('A:A', 5)
         r_instruc.set_column('B:B', 120)
-        r_instruc.write('B2', 'Instrucciones:', subtitulo)
+        r_instruc.write('B2', 'INSTRUCCIONES:', subtitulo)
         r_instruc.write('B3', 'A continuación encontrarás indicaciones para comprender de mejor forma este reporte.'
                         , text_norm)
         r_instruc.write('B4', 'Pestaña Resumen: ', text_bold)
@@ -118,20 +97,20 @@ class ArchIfc:
             nom_proy = proy.Name
         else:
             nom_proy = proy.LongName
-        info_resumen.append(('Nombre de proyecto', nom_proy))
+        info_resumen.append(('PROYECTO', nom_proy))
         edi = Ifc.by_type('IfcBuilding')[0]
         nom_edi = ''
         if edi.LongName is None:
             nom_edi = edi.Name
         else:
             nom_edi = edi.LongName
-        info_resumen.append(('Nombre de Edificación', nom_edi))
+        info_resumen.append(('EDIFICACIÓN', nom_edi))
         apli = Ifc.by_type('IfcApplication')[0]
-        info_resumen.append(('Aplicación de origen', apli.ApplicationFullName))
+        info_resumen.append(('APLICACIÓN DE ORIGEN', apli.ApplicationFullName))
         version = Ifc.schema
-        info_resumen.append(('Versión esquema IFC', version))
-        r_resumen.merge_range('A1:B1', 'Resumen del modelo', text_bold)
-        r_resumen.set_column('A:A', 20)
+        info_resumen.append(('VERSIÓN ESQUEMA IFC', version))
+        r_resumen.merge_range('A1:B1', 'RESUMEN DEL MODELO', text_bold)
+        r_resumen.set_column('A:A', 25)
         r_resumen.set_column('B:B', 60)
 
         row = 1
@@ -143,29 +122,29 @@ class ArchIfc:
             row +=1
 
         # Crear hoja Proyecto e ingresar información
-        r_proyecto = reporte.add_worksheet('Proyecto')
+        r_proyecto = reporte.add_worksheet('PROYECTO')
         r_proyecto.set_column('A:A', 20)
         r_proyecto.set_column('B:B', 60)
         proyatt = []
-        proyatt.append(('GlobalId', proy.GlobalId))
+        proyatt.append(('GLOBAL ID', proy.GlobalId))
         if proy.LongName is None:
-            proyatt.append(('Nombre de proyecto', 'No ingresado'))
+            proyatt.append(('LONGNAME', 'No ingresado'))
         else:
-            proyatt.append(('Nombre de proyecto', proy.LongName))
+            proyatt.append(('LONGNAME', proy.LongName))
         if proy.Name is None:
-            proyatt.append(('Número de proyecto', 'No ingresado'))
+            proyatt.append(('NAME', 'No ingresado'))
         else:
-            proyatt.append(('Número de proyecto', proy.Name))
+            proyatt.append(('NAME', proy.Name))
         if proy.Description is None:
-            proyatt.append(('Descripción', 'No ingresada'))
+            proyatt.append(('DESCRIPTION', 'No ingresada'))
         else:
-            proyatt.append(('Descripción', proy.Description))
+            proyatt.append(('DESCRIPTION', proy.Description))
         if proy.Phase is None:
-            proyatt.append(('Status', 'No ingresado'))
+            proyatt.append(('PHASE', 'No ingresado'))
         else:
-            proyatt.append(('Status', proy.Phase))
+            proyatt.append(('PHASE', proy.Phase))
 
-        r_proyecto.merge_range('A1:B1', 'Información del Proyecto', text_bold)
+        r_proyecto.merge_range('A1:B1', 'INFORMACIÓN DEL PROYECTO', text_bold)
 
         row = 1
         col = 0
@@ -177,56 +156,61 @@ class ArchIfc:
 
         # Crear hoja Edificio e ingresar información
 
-        r_edificio = reporte.add_worksheet('Edificio')
-        r_edificio.set_column('A:A', 20)
+        r_edificio = reporte.add_worksheet('EDIFICIO')
+        r_edificio.set_column('A:A', 30)
         r_edificio.set_column('B:B', 60)
-        r_edificio.merge_range('A1:B1', 'Información del Edificio', text_bold)
+        r_edificio.merge_range('A1:B1', 'INFORMACIÓN DEL EDIFICIO', text_bold)
 
         eInfo = []
-        eInfo.append(('Id Edificio', edi.GlobalId))
+        eInfo.append(('GLOBAL ID', edi.GlobalId))
 
         if edi.LongName is None:
-            eInfo.append(('Nombre de Edificio', 'No ingresado'))
+            eInfo.append(('LONGNAME', 'No ingresado'))
         else:
-            eInfo.append(('Nombre de Edificio', edi.LongName))
+            eInfo.append(('LONGNAME', edi.LongName))
 
         if edi.Name is None:
-            eInfo.append(('Código de Edificio: ', 'No ingresado'))
+            eInfo.append(('NAME', 'No ingresado'))
         else:
-            eInfo.append(('Código de Edificio: ', edi.Name))
+            eInfo.append(('NAME', edi.Name))
 
         if edi.Description is None:
-            eInfo.append(('Tipo de Edificación:', 'No ingresado'))
+            eInfo.append(('DESCRIPTION', 'No ingresado'))
         else:
-            eInfo.append(('Tipo Edificación: ', edi.Description))
+            eInfo.append(('DESCRIPTION', edi.Description))
 
         if edi.ObjectType is None:
-            eInfo.append(('Tipo', 'No ingresado'))
+            eInfo.append(('OBJECT TYPE', 'No ingresado'))
         else:
-            eInfo.append(('Tipo', edi.ObjectType))
+            eInfo.append(('OBJECT TYPE', edi.ObjectType))
 
         if edi.CompositionType is None:
-            eInfo.append(('Composition Type', 'No ingresado'))
+            eInfo.append(('COMPOSITION TYPE', 'No ingresado'))
         else:
-            eInfo.append(('Composition Type', edi.CompositionType))
+            eInfo.append(('COMPOSITION TYPE', edi.CompositionType))
 
         if edi.ElevationOfRefHeight is None:
-            eInfo.append(('Elevación referencial', 'No ingresada'))
+            eInfo.append(('ELEVATION OF REF HEIGHT', 'No ingresada'))
         else:
-            eInfo.append(('Elevación referencial', edi.ElevationOfRefHeight))
+            eInfo.append(('ELEVATION OF REF HEIGHT', edi.ElevationOfRefHeight))
 
         if edi.ElevationOfTerrain is None:
-            eInfo.append(('Elevación Terreno', 'No ingresada'))
+            eInfo.append(('ELEVATION OF TERRAIN', 'No ingresada'))
         else:
-            eInfo.append(('Elevación Terreno', edi.ElevationOfTerrain))
+            eInfo.append(('ELEVATION OF TERRAIN', edi.ElevationOfTerrain))
 
         if edi.BuildingAddress is None:
-            eInfo.append(('Dirección del Edificio', 'No ingresada'))
+            eInfo.append(('BUILDING ADDRESS', 'No ingresada'))
         else:
-            eInfo.append(('Dirección del Edificio', str(edi.BuildingAddress)))
-
+            edirec = ''
+            for i in edi.BuildingAddress:
+                if i is None:
+                    pass
+                else:
+                    edirec = edirec + str(i) + '|'
+            eInfo.append(('BUILDING ADDRESS', edirec))
         pisos = Ifc.by_type('IfcBuildingStorey')
-        eInfo.append(('Niveles: ', str(len(pisos))))
+        eInfo.append(('BUILDING STOREYS', str(len(pisos))))
 
         row = 1
         col = 0
@@ -237,44 +221,50 @@ class ArchIfc:
             row += 1
 
         # Crear hoja de Terreno e ingresar información
-        r_terreno = reporte.add_worksheet('Terreno')
+        r_terreno = reporte.add_worksheet('TERRENO')
         r_terreno.set_column('A:A', 20)
         r_terreno.set_column('B:B', 60)
-        r_terreno.merge_range('A1:B1', 'Información del Terreno', text_bold)
+        r_terreno.merge_range('A1:B1', 'INFORMACIÓN DEL TERRENO', text_bold)
 
         terreno = Ifc.by_type('IfcSite')[0]
-        infote = [('Id Terreno', terreno.GlobalId)]
+        infote = [('GLOBAL ID', terreno.GlobalId)]
         if terreno.LongName is None:
-            infote.append(('Nombre terreno', 'No ingresado'))
+            infote.append(('LONGNAME', 'No ingresado'))
         else:
-            infote.append(('Nombre terreno', terreno.LongName))
+            infote.append(('LONGNAME', terreno.LongName))
         if terreno.Name is None:
-            infote.append(('Código Terreno', 'No ingresado'))
+            infote.append(('NAME', 'No ingresado'))
         else:
-            infote.append(('Código Terreno', terreno.Name))
+            infote.append(('NAME', terreno.Name))
         if terreno.Description is None:
-            infote.append(('Descripción Terreno', 'No ingresado'))
+            infote.append(('DESCRIPTION', 'No ingresado'))
         else:
-            infote.append(('Descripción Terreno', terreno.Description))
+            infote.append(('DESCRIPTION', terreno.Description))
         if terreno.ObjectType is None:
-            infote.append(('Tipo', 'No ingresado'))
+            infote.append(('OBJECT TYPE', 'No ingresado'))
         else:
-            infote.append(('Tipo', terreno.ObjectType))
+            infote.append(('OBJECT TYPE', terreno.ObjectType))
         if terreno.CompositionType is None:
-            infote.append(('Tipo de Terreno', 'No ingresado'))
+            infote.append(('COMPOSITION TYPE', 'No ingresado'))
         else:
-            infote.append(('Tipo de Terreno', terreno.CompositionType))
-        infote.append(('Latitud Ref', str(terreno.RefLatitude)))
-        infote.append(('Longitud Ref', str(terreno.RefLongitude)))
-        infote.append(('Elevación Ref', str(terreno.RefElevation)))
+            infote.append(('COMPOSITION TYPE', terreno.CompositionType))
+        infote.append(('REF LATITUDE', str(terreno.RefLatitude)))
+        infote.append(('REF LONGITUDE', str(terreno.RefLongitude)))
+        infote.append(('REF ELEVATION', str(terreno.RefElevation)))
         if terreno.LandTitleNumber is None:
-            infote.append(('Número de Título del Terreno', 'No ingresado'))
+            infote.append(('LAND TITLE NUMBER', 'No ingresado'))
         else:
-            infote.append(('Número de Título del Terreno', terreno.LandTitleNumber))
+            infote.append(('LAND TITLE NUMBER', terreno.LandTitleNumber))
         if terreno.SiteAddress is None:
-            infote.append(('Dirección del Terreno', 'No ingresado'))
+            infote.append(('SITE ADDRESS', 'No ingresado'))
         else:
-            infote.append(('Dirección del Terreno', str(terreno.SiteAddress)))
+            tedirec = ''
+            for i in terreno.SiteAddress:
+                if i is None:
+                    pass
+                else:
+                    tedirec = tedirec + str(i) + '|'
+            infote.append(('SITE ADDRESS', tedirec))
 
         row = 1
         col = 0
@@ -285,14 +275,14 @@ class ArchIfc:
             row += 1
 
         # Crear pestaña Entidades
-        r_entidades = reporte.add_worksheet('Entidades')
+        r_entidades = reporte.add_worksheet('ENTIDADES')
         r_entidades.set_column('A:A', 20)
         r_entidades.set_column('B:B', 30)
         r_entidades.set_column('C:C', 60)
-        r_entidades.merge_range('A1:C1', 'Entidades del modelo', text_bold)
-        r_entidades.write('A2', 'Entidad IFC', text_bold)
-        r_entidades.write('B2', 'GUId', text_bold)
-        r_entidades.write('C2', 'Nombre', text_bold)
+        r_entidades.merge_range('A1:C1', 'ENTIDADES DEL MODELO', text_bold)
+        r_entidades.write('A2', 'IFC ENTITY', text_bold)
+        r_entidades.write('B2', 'GLOBALID', text_bold)
+        r_entidades.write('C2', 'NAME', text_bold)
         id_ent = []
         entidades = Ifc.by_type('IfcObject')
         for en in entidades:
@@ -308,7 +298,7 @@ class ArchIfc:
             row += 1
 
         # Crear pestaña Atributos_1
-        r_atributos_1 = reporte.add_worksheet('Atributos_1')
+        r_atributos_1 = reporte.add_worksheet('ATRIBUTOS_1')
         r_atributos_1.set_column('A:A', 6)
         r_atributos_1.set_column('B:B', 30)
         r_atributos_1.set_column('C:C', 30)
@@ -318,7 +308,7 @@ class ArchIfc:
         r_atributos_1.set_column('G:G', 10)
         r_atributos_1.set_column('H:H', 20)
 
-        r_atributos_1.merge_range('A1:H1', 'Atributos de elementos constructivos básicos', text_bold)
+        r_atributos_1.merge_range('A1:H1', 'ATRIBUTOS DE ELEMENTOS CONSTRUCTIVOS BÁSICOS', text_bold)
         attri_1 = []
         enti_1 = ['IfcWall', 'IfcWallStandardCase', 'IfcColumn', 'IfcBeam', 'IfcSlab', 'IfcFooting', 'IfcPile',
                   'IfcCurtainWall', 'IfcRoof', 'IfcElementAssembly']
@@ -353,7 +343,7 @@ class ArchIfc:
             r_atributos_1.write(row, col, 'Este proyecto no contiene elementos constructivos básicos.', data_text)
 
         # Crear pestaña Atributos_2
-        r_atributos_2 = reporte.add_worksheet('Atributos_2')
+        r_atributos_2 = reporte.add_worksheet('ATRIBUTOS_2')
         r_atributos_2.set_column('A:A', 6)
         r_atributos_2.set_column('B:B', 10)
         r_atributos_2.set_column('C:C', 30)
@@ -367,7 +357,7 @@ class ArchIfc:
         r_atributos_2.set_column('K:K', 25)
         r_atributos_2.set_column('L:L', 25)
 
-        r_atributos_2.merge_range('A1:L1', 'Atributos de Puertas y Ventanas', text_bold)
+        r_atributos_2.merge_range('A1:L1', 'ATRIBUTOS DE PUERTAS Y VENTANAS', text_bold)
         attri_2 = []
         enti_2 = ['IfcWindow', 'IfcDoor']
 
@@ -402,7 +392,7 @@ class ArchIfc:
             r_atributos_2.write(row, col, 'Este proyecto no contiene puertas ni ventanas.', data_text)
 
         # Crear pestaña Atributos_3
-        r_atributos_3 = reporte.add_worksheet('Atributos_3')
+        r_atributos_3 = reporte.add_worksheet('ATRIBUTOS_3')
         r_atributos_3.set_column('A:A', 6)
         r_atributos_3.set_column('B:B', 10)
         r_atributos_3.set_column('C:C', 30)
@@ -416,7 +406,7 @@ class ArchIfc:
         r_atributos_3.set_column('K:K', 25)
         r_atributos_3.set_column('L:L', 25)
 
-        r_atributos_3.merge_range('A1:L1', 'Atributos de Escaleras y Rampas', text_bold)
+        r_atributos_3.merge_range('A1:L1', 'ATRIBUTOS DE ESCALERAS Y RAMPAS', text_bold)
         attri_3 = []
         enti_3 = ['IfcStair', 'IfcStairFlight', 'IfcRamp',  'IfcRampFlight']
 
@@ -450,7 +440,7 @@ class ArchIfc:
             r_atributos_3.write(row, col, 'Este proyecto no contiene escaleras ni rampas.', data_text)
 
             # Crear pestaña Atributos_4
-            r_atributos_4 = reporte.add_worksheet('Atributos_4')
+            r_atributos_4 = reporte.add_worksheet('ATRIBUTOS_4')
             r_atributos_4.set_column('A:A', 6)
             r_atributos_4.set_column('B:B', 25)
             r_atributos_4.set_column('C:C', 30)
@@ -464,7 +454,7 @@ class ArchIfc:
             r_atributos_4.set_column('K:K', 25)
             r_atributos_4.set_column('L:L', 25)
 
-            r_atributos_4.merge_range('A1:H1', 'Atributos de elementos MEP', text_bold)
+            r_atributos_4.merge_range('A1:H1', 'ATRIBUTOS DE ELEMENTOS MEP', text_bold)
             attri_4 = []
             entiflow = Ifc.by_type('IfcDistributionElement')
             for e in entiflow:
@@ -496,7 +486,7 @@ class ArchIfc:
                 r_atributos_4.write(row, col, 'Este proyecto no contiene elementos MEP.', data_text)
 
         # Crear pestaña Atributos_5
-        r_atributos_5 = reporte.add_worksheet('Atributos_5')
+        r_atributos_5 = reporte.add_worksheet('ATRIBUTOS_5')
         r_atributos_5.set_column('A:A', 6)
         r_atributos_5.set_column('B:B', 25)
         r_atributos_5.set_column('C:C', 30)
@@ -510,7 +500,7 @@ class ArchIfc:
         r_atributos_5.set_column('K:K', 25)
         r_atributos_5.set_column('L:L', 25)
 
-        r_atributos_5.merge_range('A1:H1', 'Atributos de Mobiliario y elementos secundarios', text_bold)
+        r_atributos_5.merge_range('A1:H1', 'ATRIBUTOS DE MOBILIARIO Y ELEMENTOS SECUNDARIOS', text_bold)
         attri_5 = []
         enti_5 = ['IfcFurniture', 'IfcSystemFurnitureElement', 'IfcShadingDevice', 'IfcCovering', 'IfcPlate',
                   'IfcMember', 'IfcRailing', 'IfcBuildingElementProxy']
@@ -544,7 +534,7 @@ class ArchIfc:
             r_atributos_5.write(row, col, 'Este proyecto no contiene mobiliario ni elementos secundarios.', data_text)
 
         # Crear pestaña Atributos_6
-        r_atributos_6 = reporte.add_worksheet('Atributos_6')
+        r_atributos_6 = reporte.add_worksheet('ATRIBUTOS_6')
         r_atributos_6.set_column('A:A', 6)
         r_atributos_6.set_column('B:B', 25)
         r_atributos_6.set_column('C:C', 30)
@@ -558,7 +548,7 @@ class ArchIfc:
         r_atributos_6.set_column('K:K', 25)
         r_atributos_6.set_column('L:L', 25)
 
-        r_atributos_6.merge_range('A1:H1', 'Atributos de Espacios y Zonas', text_bold)
+        r_atributos_6.merge_range('A1:H1', 'ATRIBUTOS DE ESPACIOS Y ZONAS', text_bold)
         attri_6 = []
         enti_6 = ['IfcSpace', 'IfcZone, IfcSpatialZone']
         for e in entidades:
@@ -591,7 +581,7 @@ class ArchIfc:
             r_atributos_6.write(row, col, 'Este proyecto no contiene espacios ni zonas.', data_text)
 
         # Crear pestaña Atributos_7
-        r_atributos_7 = reporte.add_worksheet('Atributos_7')
+        r_atributos_7 = reporte.add_worksheet('ATRIBUTOS_7')
         r_atributos_7.set_column('A:A', 6)
         r_atributos_7.set_column('B:B', 25)
         r_atributos_7.set_column('C:C', 30)
@@ -605,7 +595,7 @@ class ArchIfc:
         r_atributos_7.set_column('K:K', 25)
         r_atributos_7.set_column('L:L', 25)
 
-        r_atributos_7.merge_range('A1:H1', 'Atributos de Elementos Geográficos y Civiles', text_bold)
+        r_atributos_7.merge_range('A1:H1', 'ATRIBUTOS DE ELEMENTOS GEOGRÁFICOS Y CIVILES', text_bold)
         attri_7 = []
         enti_7 = ['IfcGeographicElement', 'IfcCivilElement']
         for e in entidades:
@@ -639,14 +629,14 @@ class ArchIfc:
 
 
         # Crear pestaña Propiedades
-        r_propiedades = reporte.add_worksheet('Propiedades')
+        r_propiedades = reporte.add_worksheet('PROPIEDADES')
         r_propiedades.set_column('A:A', 25)
         r_propiedades.set_column('B:B', 30)
         r_propiedades.set_column('C:C', 60)
         r_propiedades.set_column('D:D', 25)
         r_propiedades.set_column('E:E', 40)
 
-        r_propiedades.merge_range('A1:E1', 'Propiedades de los elementos del modelo', text_bold)
+        r_propiedades.merge_range('A1:E1', 'PROPIEDADES DE LOS ELEMENTOS DEL MODELO', text_bold)
 
 
         psets = []
@@ -660,11 +650,11 @@ class ArchIfc:
                             if data.is_a('IfcPropertySingleValue'):
                                 psets.append((e.GlobalId, e.is_a(), e.Name, data.Name, data.NominalValue.wrappedValue))
 
-        r_propiedades.write('A2', 'GlobalId', text_bold)
-        r_propiedades.write('B2', 'Ifc Entity', text_bold)
-        r_propiedades.write('C2', 'Name', text_bold)
-        r_propiedades.write('D2', 'Property', text_bold)
-        r_propiedades.write('E2', 'Value', text_bold)
+        r_propiedades.write('A2', 'GLOBAL ID', text_bold)
+        r_propiedades.write('B2', 'IFC ENTITY', text_bold)
+        r_propiedades.write('C2', 'NAME', text_bold)
+        r_propiedades.write('D2', 'PROPERTY', text_bold)
+        r_propiedades.write('E2', 'VALUE', text_bold)
 
         row = 2
         col = 0
@@ -678,14 +668,14 @@ class ArchIfc:
             row +=1
 
         # Crear pestaña Cuantías
-        r_cuantias = reporte.add_worksheet('Cuantias')
+        r_cuantias = reporte.add_worksheet('CUANTÍAS')
         r_cuantias.set_column('A:A', 25)
         r_cuantias.set_column('B:B', 30)
         r_cuantias.set_column('C:C', 60)
         r_cuantias.set_column('D:D', 25)
         r_cuantias.set_column('E:E', 40)
 
-        r_cuantias.merge_range('A1:E1', 'Cuantías de los elementos del modelo', text_bold)
+        r_cuantias.merge_range('A1:E1', 'CUANTÍAS DE LOS ELEMENTOS DEL MODELO', text_bold)
         quant = []
         for e in entidades:
             sets = e.IsDefinedBy
@@ -696,11 +686,11 @@ class ArchIfc:
                         for q in set.RelatingPropertyDefinition.Quantities:
                             quant.append((e.GlobalId, e.is_a(), e.Name, q.Name, q[3]))
 
-        r_cuantias.write('A2', 'GlobalId', text_bold)
-        r_cuantias.write('B2', 'Ifc Entity', text_bold)
-        r_cuantias.write('C2', 'Name', text_bold)
-        r_cuantias.write('D2', 'Quantity', text_bold)
-        r_cuantias.write('E2', 'Value', text_bold)
+        r_cuantias.write('A2', 'GLOBAL ID', text_bold)
+        r_cuantias.write('B2', 'IFC ENTITY', text_bold)
+        r_cuantias.write('C2', 'NAME', text_bold)
+        r_cuantias.write('D2', 'QUANTITY', text_bold)
+        r_cuantias.write('E2', 'VALUE', text_bold)
 
         row = 2
         col = 0
@@ -714,3 +704,7 @@ class ArchIfc:
             row +=1
 
         reporte.close()
+        carpeta = os.path.dirname(os.path.abspath(__file__))
+        nombre_repo = (proy.Name + '_reporte.xlsx')
+        ruta_repo = os.path.join(carpeta, nombre_repo)
+        os.startfile(ruta_repo)

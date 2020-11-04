@@ -9,9 +9,10 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog, QProgressBar, QPushButton, QWidget, QHBoxLayout, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QFileDialog, QVBoxLayout
 from Funciones import ArchIfc
 from sobreix import Ui_Dialog
+
 
 ai = 'x'
 
@@ -175,7 +176,7 @@ class Ui_MainWin(object):
         self.label.adjustSize()
 
     def open_dialog_box(self):
-        filename = QFileDialog.getOpenFileName()
+        filename = QFileDialog.getOpenFileName(parent=None, caption='Abrir archivo...', filter= 'Ifc *.ifc')
         path = filename[0]
         global ai
         ai = ArchIfc(path)
