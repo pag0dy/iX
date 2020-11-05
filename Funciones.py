@@ -5,11 +5,16 @@ import datetime
 import time
 import getpass
 import os
+import os.path
 
+directorio = ''
 
 class ArchIfc:
     def __init__(self, ruta):
         self.Ifc = IfcOs.open(ruta)
+        global directorio
+        directorio = os.path.dirname(ruta)
+        print(directorio)
 
     def infomod(self, Ifc):
         info_mod = {}
@@ -27,7 +32,8 @@ class ArchIfc:
         #Crear archivo xlsx base para el reporte
         info_resumen = []
         proy = Ifc.by_type('IfcProject')[0]
-        reporte = wr.Workbook(proy.Name + '_reporte.xlsx')
+        global directorio
+        reporte = wr.Workbook(str(directorio) + '/' + proy.Name + '_reporte.xlsx')
         r_portada = reporte.add_worksheet('PORTADA')
         r_instruc = reporte.add_worksheet('INSTRUCCIONES')
         r_resumen = reporte.add_worksheet('RESUMEN')
@@ -366,7 +372,7 @@ class ArchIfc:
                 attri_2.append(e.get_info())
         dfAtri_2 = pd.DataFrame(attri_2).drop_duplicates()
         if len(dfAtri_2) > 1:
-            dfA_2 = dfAtri_2.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation', 'UserDefinedOperationType', 'UserDefinedPartitioningType'], axis=1)
+            dfA_2 = dfAtri_2.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
             dfA_2 = dfA_2.fillna(value='No disponible')
             row = 1
             col = 0
@@ -704,7 +710,6 @@ class ArchIfc:
             row +=1
 
         reporte.close()
-        carpeta = os.path.dirname(os.path.abspath(__file__))
         nombre_repo = (proy.Name + '_reporte.xlsx')
-        ruta_repo = os.path.join(carpeta, nombre_repo)
+        ruta_repo = os.path.join(directorio, nombre_repo)
         os.startfile(ruta_repo)
