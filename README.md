@@ -1,7 +1,7 @@
 # iX
 Aplicación basada en IfcOpenShell, PyQt5, Pandas y XlsxWriter para extraer la información principal de los modelos BIM en formato [IFC](https://technical.buildingsmart.org/standards/ifc/) en un reporte estilo hoja de cálculo, con extensión xlsx. 
 
-Compatibilidad probada con IFC 4, posiblemente también funciona con IFC 2x3.
+Compatibilidad probada con IFC 4, también funciona con IFC 2x3.
 
 ![GUI](/ix.png)
 
