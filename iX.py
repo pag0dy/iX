@@ -163,6 +163,7 @@ class Ui_MainWin(object):
         self.botAbout.clicked.connect(self.openWindow)
 
 
+
     def pushButton_handler(self):
         print("Abrir archivo")
         self.open_dialog_box()
@@ -177,29 +178,41 @@ class Ui_MainWin(object):
 
     def open_dialog_box(self):
         filename = QFileDialog.getOpenFileName(parent=None, caption='Abrir archivo...', filter= 'Ifc *.ifc')
+        error_dialog = QtWidgets.QMessageBox()
+        error_dialog.setIcon(QtWidgets.QMessageBox.Critical)
+        error_dialog.setText('Error')
+        error_dialog.setInformativeText('El archivo no es válido.')
+        error_dialog.setWindowTitle('Error')
+
         path = filename[0]
         global ai
         ai = ArchIfc(path)
-        archi = ai.Ifc
-        daf = ai.infomod(archi)
-        self.estadoApp.setText('Archivo cargado! Haz en click en Crear Reporte.')
-        self.resumenIfc.setText(str(path))
-        print(ai.infomod(ai.Ifc))
-        self.botReport.setEnabled(True)
-        self.botReport.setStyleSheet("QPushButton {\n"
-"    background-color: rgb(222, 159, 50);\n"
-"    border-radius: 10px;\n"
-"    color: rgb(60, 47, 69);\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgb(90, 47, 69);\n"
-"    color: rgb(222, 159, 50);\n"
-"}\n"
-"QPushButton:pressed {\n"
-"    background-color: rgb(255, 183, 57);\n"
-"    color: rgb(60, 47, 69);\n"
-"}")
-        return ai
+        try:
+            archi = ai.Ifc
+
+        except AttributeError:
+            error_dialog.exec_()
+
+        else:
+            daf = ai.infomod(archi)
+            self.estadoApp.setText('Archivo cargado! Haz en click en Crear Reporte.')
+            self.resumenIfc.setText(str(path))
+            print(ai.infomod(ai.Ifc))
+            self.botReport.setEnabled(True)
+            self.botReport.setStyleSheet("QPushButton {\n"
+                                         "    background-color: rgb(222, 159, 50);\n"
+                                         "    border-radius: 10px;\n"
+                                         "    color: rgb(60, 47, 69);\n"
+                                         "}\n"
+                                         "QPushButton:hover {\n"
+                                         "    background-color: rgb(90, 47, 69);\n"
+                                         "    color: rgb(222, 159, 50);\n"
+                                         "}\n"
+                                         "QPushButton:pressed {\n"
+                                         "    background-color: rgb(255, 183, 57);\n"
+                                         "    color: rgb(60, 47, 69);\n"
+                                         "}")
+            return ai
 
     def crearReporte(self):
         global ai

@@ -11,10 +11,13 @@ directorio = ''
 
 class ArchIfc:
     def __init__(self, ruta):
-        self.Ifc = IfcOs.open(ruta)
-        global directorio
-        directorio = os.path.dirname(ruta)
-        print(directorio)
+        try:
+            self.Ifc = IfcOs.open(ruta)
+            global directorio
+            directorio = os.path.dirname(ruta)
+            print(directorio)
+        except IOError:
+            print('Archivo seleccionado no es válido')
 
     def infomod(self, Ifc):
         info_mod = {}
