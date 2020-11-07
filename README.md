@@ -3,7 +3,8 @@ Aplicación basada en IfcOpenShell, PyQt5, Pandas y XlsxWriter para extraer la i
 
 Compatibilidad probada con IFC 4, también funciona con IFC 2x3.
 
-![GUI](/ix.png)
+![Gui](/ixapp.png)
+![Reporte](/reporte_ix.png)
 
 # Archivos y Dependencias
 Esta aplicación fue creada con Python 3.8. Para replicarla es necesario instalar las librerías PyQt5, Pandas, IfcOpenShell y XlsxWriter. 
