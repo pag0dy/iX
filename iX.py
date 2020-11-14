@@ -12,6 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QVBoxLayout
 from Funciones import ArchIfc
 from sobreix import Ui_Dialog
+from pathlib import Path
 
 
 ai = 'x'
@@ -114,7 +115,7 @@ class Ui_MainWin(object):
         self.resumenIfc.setGeometry(QtCore.QRect(0, 300, 800, 70))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
-        font.setPointSize(12)
+        font.setPointSize(10)
         self.resumenIfc.setFont(font)
         self.resumenIfc.setAutoFillBackground(False)
         self.resumenIfc.setStyleSheet("color: rgb(174, 181, 191);")
@@ -194,9 +195,10 @@ class Ui_MainWin(object):
             error_dialog.exec_()
 
         else:
+            dire = Path(path)
             daf = ai.infomod(archi)
             self.estadoApp.setText('Archivo cargado! Haz en click en Crear Reporte.')
-            self.resumenIfc.setText(str(path))
+            self.resumenIfc.setText(str(dire.name))
             print(ai.infomod(ai.Ifc))
             self.botReport.setEnabled(True)
             self.botReport.setStyleSheet("QPushButton {\n"

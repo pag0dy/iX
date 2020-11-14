@@ -6,15 +6,17 @@ import time
 import getpass
 import os
 import os.path
+from pathlib import Path
 
 directorio = ''
+
 
 class ArchIfc:
     def __init__(self, ruta):
         try:
             self.Ifc = IfcOs.open(ruta)
             global directorio
-            directorio = os.path.dirname(ruta)
+            directorio = Path(ruta)
             print(directorio)
         except IOError:
             print('Archivo seleccionado no es válido')
@@ -35,8 +37,9 @@ class ArchIfc:
         #Crear archivo xlsx base para el reporte
         info_resumen = []
         proy = Ifc.by_type('IfcProject')[0]
+        nom_modelo = ''.join(x for x in proy.Name if x.isalnum())# Esta línea elimina los posibles caracteres invalidos del nombre
         global directorio
-        reporte = wr.Workbook(str(directorio) + '/' + proy.Name + '_reporte.xlsx')
+        reporte = wr.Workbook(str(directorio) + '/' + nom_modelo + '_reporte.xlsx')
         r_portada = reporte.add_worksheet('PORTADA')
         r_instruc = reporte.add_worksheet('INSTRUCCIONES')
         r_resumen = reporte.add_worksheet('RESUMEN')
@@ -644,8 +647,9 @@ class ArchIfc:
         r_propiedades.set_column('C:C', 60)
         r_propiedades.set_column('D:D', 25)
         r_propiedades.set_column('E:E', 40)
+        r_propiedades.set_column('F:F', 40)
 
-        r_propiedades.merge_range('A1:E1', 'PROPIEDADES DE LOS ELEMENTOS DEL MODELO', text_bold)
+        r_propiedades.merge_range('A1:F1', 'PROPIEDADES DE LOS ELEMENTOS DEL MODELO', text_bold)
 
 
         psets = []
@@ -657,23 +661,30 @@ class ArchIfc:
                     if related_data.is_a('IfcPropertySet'):
                         for data in related_data.HasProperties:
                             if data.is_a('IfcPropertySingleValue'):
-                                psets.append((e.GlobalId, e.is_a(), e.Name, data.Name, data.NominalValue.wrappedValue))
-
+                                if data.NominalValue is None:
+                                    pass
+                                else:
+                                    psets.append((e.GlobalId, e.is_a(), e.Name, related_data.Name, data.Name, data.NominalValue.wrappedValue))
+                            if data.is_a('IfcPropertyEnumeratedValue'):
+                                psets.append((e.GlobalId, e.is_a(), e.Name, related_data.Name, data.Name,
+                                                data.EnumerationValues[0].wrappedValue))
         r_propiedades.write('A2', 'GLOBAL ID', text_bold)
         r_propiedades.write('B2', 'IFC ENTITY', text_bold)
         r_propiedades.write('C2', 'NAME', text_bold)
-        r_propiedades.write('D2', 'PROPERTY', text_bold)
-        r_propiedades.write('E2', 'VALUE', text_bold)
+        r_propiedades.write('D2', 'PSET_NAME', text_bold)
+        r_propiedades.write('E2', 'PROPERTY', text_bold)
+        r_propiedades.write('F2', 'VALUE', text_bold)
 
         row = 2
         col = 0
 
-        for i, a, n, d, v in psets:
+        for i, a, n, p, d, v in psets:
             r_propiedades.write(row, col, i, data_text)
             r_propiedades.write(row, col+1, a, data_text)
             r_propiedades.write(row, col+2, n, data_text)
-            r_propiedades.write(row, col+3, d, data_text)
-            r_propiedades.write(row, col+4, v, data_text)
+            r_propiedades.write(row, col + 3, p, data_text)
+            r_propiedades.write(row, col+4, d, data_text)
+            r_propiedades.write(row, col+5, v, data_text)
             row +=1
 
         # Crear pestaña Cuantías
@@ -713,6 +724,7 @@ class ArchIfc:
             row +=1
 
         reporte.close()
-        nombre_repo = (proy.Name + '_reporte.xlsx')
+        nom_modelo = ''.join(x for x in proy.Name if x.isalnum())
+        nombre_repo = (nom_modelo + '_reporte.xlsx')
         ruta_repo = os.path.join(directorio, nombre_repo)
         os.startfile(ruta_repo)
