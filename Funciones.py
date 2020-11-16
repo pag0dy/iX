@@ -16,7 +16,7 @@ class ArchIfc:
         try:
             self.Ifc = IfcOs.open(ruta)
             global directorio
-            directorio = Path(ruta)
+            directorio = Path(ruta).parent
             print(directorio)
         except IOError:
             print('Archivo seleccionado no es válido')
@@ -328,7 +328,7 @@ class ArchIfc:
             if e.is_a() in enti_1:
                 attri_1.append(e.get_info())
         dfAtri = pd.DataFrame(attri_1).drop_duplicates()
-        if len(dfAtri) > 1:
+        if len(dfAtri) > 0:
             dfA = dfAtri.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
             dfA = dfA.fillna('No disponible')
             row = 1
@@ -377,7 +377,7 @@ class ArchIfc:
             if e.is_a() in enti_2:
                 attri_2.append(e.get_info())
         dfAtri_2 = pd.DataFrame(attri_2).drop_duplicates()
-        if len(dfAtri_2) > 1:
+        if len(dfAtri_2) > 0:
             dfA_2 = dfAtri_2.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
             dfA_2 = dfA_2.fillna(value='No disponible')
             row = 1
@@ -426,7 +426,7 @@ class ArchIfc:
             if e.is_a() in enti_3:
                 attri_3.append(e.get_info())
         dfAtri_3 = pd.DataFrame(attri_3).drop_duplicates()
-        if len(dfAtri_3) > 1:
+        if len(dfAtri_3) > 0:
             dfA_3 = dfAtri_3.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
             dfA_3 = dfA_3.fillna(value='No disponible')
             row = 1
@@ -472,7 +472,7 @@ class ArchIfc:
             for e in entiflow:
                 attri_4.append(e.get_info())
             dfAtri_4 = pd.DataFrame(attri_4).drop_duplicates()
-            if len(dfAtri_4) > 1:
+            if len(dfAtri_4) > 0:
                 dfA_4 = dfAtri_4.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
                 dfA_4 = dfA_4.fillna(value='No disponible')
                 row = 1
@@ -520,7 +520,7 @@ class ArchIfc:
             if e.is_a() in enti_5:
                 attri_5.append(e.get_info())
         dfAtri_5 = pd.DataFrame(attri_5).drop_duplicates()
-        if len(dfAtri_5) > 1:
+        if len(dfAtri_5) > 0:
             dfA_5 = dfAtri_5.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
             dfA_5 = dfA_5.fillna(value='No disponible')
             row = 1
@@ -567,7 +567,7 @@ class ArchIfc:
             if e.is_a() in enti_6:
                 attri_6.append(e.get_info())
         dfAtri_6 = pd.DataFrame(attri_6).drop_duplicates()
-        if len(dfAtri_6) > 1:
+        if len(dfAtri_6) > 0:
             dfA_6 = dfAtri_6.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
             dfA_6 = dfA_6.fillna(value='No disponible')
             row = 1
@@ -614,7 +614,7 @@ class ArchIfc:
             if e.is_a() in enti_7:
                 attri_7.append(e.get_info())
         dfAtri_7 = pd.DataFrame(attri_7).drop_duplicates()
-        if len(dfAtri_7) > 1:
+        if len(dfAtri_7) > 0:
             dfA_7 = dfAtri_7.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
             dfA_7 = dfA_7.fillna(value='No disponible')
             row = 1
