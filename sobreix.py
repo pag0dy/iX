@@ -46,7 +46,7 @@ class Ui_Dialog(object):
         self.textBrowser.setOpenExternalLinks(True)
         self.textBrowser.setObjectName("textBrowser")
         self.botOK = QtWidgets.QPushButton(self.frame)
-        self.botOK.setGeometry(QtCore.QRect(170, 380, 71, 51))
+        self.botOK.setGeometry(QtCore.QRect(175, 380, 71, 51))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
@@ -85,7 +85,7 @@ class Ui_Dialog(object):
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Esta aplicación fue creada por <a href=\"https://github.com/pag0dy\"><span style=\" font-size:8pt; text-decoration: underline; color:#de9f32;\">pagody</span></a>, con la intención de facilitar la revisión de la información de los modelos BIM, sin la necesidad de utilizar software de pago. </p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\"><br />Esta obra está bajo una Licencia </span><a href=\"https://www.gnu.org/licenses/gpl-3.0.html\"><span style=\" font-size:8pt; text-decoration: underline; color:#de9f32;\">GNU General Public License v3.0</span></a><span style=\" font-size:8pt;\">. </span></p>\n"
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; color:#de9f32;\">iX versión 0.1 © 2020 pagody </span></p></body></html>"))
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; color:#de9f32;\">iX versión 0.2 © 2020 pag0dy </span></p></body></html>"))
         self.botOK.setText(_translate("Dialog", "OK"))
         self.botOK.clicked.connect(Dialog.reject)
 

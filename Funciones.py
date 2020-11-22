@@ -70,6 +70,7 @@ class ArchIfc:
         r_portada.write('B4', 'Fecha: ' + str(fecha) + ' ' + str(hora), text_norm)
         r_portada.merge_range('A5:B5', None, fondo)
         r_portada.insert_image('A1', 'ix.png')
+        print('Portada de reporte creada')
 
         # Crear instrucciones reporte
         r_instruc.set_column('A:A', 5)
@@ -102,7 +103,7 @@ class ArchIfc:
         r_instruc.write('B22', 'Pestaña Cuantías: ', text_bold)
         r_instruc.write('B23', 'Contiene todas las cuantías (que son parte de un Qto) de todas las entidades del '
                                'modelo.', text_norm)
-
+        print('Hoja de instrucciones creada')
         # Ingresar información en hoja Resumen
         nom_proy = ''
         if proy.LongName is None:
@@ -132,7 +133,7 @@ class ArchIfc:
             r_resumen.write(row, col, i, text_bold)
             r_resumen.write(row, col+1, v, data_text)
             row +=1
-
+        print('Información resumen ingresada')
         # Crear hoja Proyecto e ingresar información
         r_proyecto = reporte.add_worksheet('PROYECTO')
         r_proyecto.set_column('A:A', 20)
@@ -165,7 +166,7 @@ class ArchIfc:
             r_proyecto.write(row, col, i, text_bold)
             r_proyecto.write(row, col+1, v, data_text)
             row +=1
-
+        print('Información de proyecto ingresada')
         # Crear hoja Edificio e ingresar información
 
         r_edificio = reporte.add_worksheet('EDIFICIO')
@@ -231,6 +232,7 @@ class ArchIfc:
             r_edificio.write(row, col, i, text_bold)
             r_edificio.write(row, col + 1, v, data_text)
             row += 1
+        print('Información de Edificio ingresada')
 
         # Crear hoja de Terreno e ingresar información
         r_terreno = reporte.add_worksheet('TERRENO')
@@ -285,6 +287,7 @@ class ArchIfc:
             r_terreno.write(row, col, i, text_bold)
             r_terreno.write(row, col + 1, v, data_text)
             row += 1
+        print('Información de Terreno ingresada')
 
         # Crear pestaña Entidades
         r_entidades = reporte.add_worksheet('ENTIDADES')
@@ -308,6 +311,7 @@ class ArchIfc:
             r_entidades.write(row, col + 1, i, data_text)
             r_entidades.write(row, col + 2, n, data_text)
             row += 1
+        print('Información de Entidades ingresada')
 
         # Crear pestaña Atributos_1
         r_atributos_1 = reporte.add_worksheet('ATRIBUTOS_1')
@@ -353,6 +357,7 @@ class ArchIfc:
             row = 1
             col = 0
             r_atributos_1.write(row, col, 'Este proyecto no contiene elementos constructivos básicos.', data_text)
+        print('Información de Atributos_1 ingresada')
 
         # Crear pestaña Atributos_2
         r_atributos_2 = reporte.add_worksheet('ATRIBUTOS_2')
@@ -402,6 +407,8 @@ class ArchIfc:
             row = 1
             col = 0
             r_atributos_2.write(row, col, 'Este proyecto no contiene puertas ni ventanas.', data_text)
+        print('Información de Atributos_2 ingresada')
+
 
         # Crear pestaña Atributos_3
         r_atributos_3 = reporte.add_worksheet('ATRIBUTOS_3')
@@ -451,51 +458,55 @@ class ArchIfc:
             col = 0
             r_atributos_3.write(row, col, 'Este proyecto no contiene escaleras ni rampas.', data_text)
 
-            # Crear pestaña Atributos_4
-            r_atributos_4 = reporte.add_worksheet('ATRIBUTOS_4')
-            r_atributos_4.set_column('A:A', 6)
-            r_atributos_4.set_column('B:B', 25)
-            r_atributos_4.set_column('C:C', 30)
-            r_atributos_4.set_column('D:D', 50)
-            r_atributos_4.set_column('E:E', 15)
-            r_atributos_4.set_column('F:F', 50)
-            r_atributos_4.set_column('G:G', 10)
-            r_atributos_4.set_column('H:H', 15)
-            r_atributos_4.set_column('I:I', 15)
-            r_atributos_4.set_column('J:J', 15)
-            r_atributos_4.set_column('K:K', 25)
-            r_atributos_4.set_column('L:L', 25)
+            print('Información de Atributos_3 ingresada')
 
-            r_atributos_4.merge_range('A1:H1', 'ATRIBUTOS DE ELEMENTOS MEP', text_bold)
-            attri_4 = []
-            entiflow = Ifc.by_type('IfcDistributionElement')
-            for e in entiflow:
-                attri_4.append(e.get_info())
-            dfAtri_4 = pd.DataFrame(attri_4).drop_duplicates()
-            if len(dfAtri_4) > 0:
-                dfA_4 = dfAtri_4.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
-                dfA_4 = dfA_4.fillna(value='No disponible')
-                row = 1
-                col = 0
+        # Crear pestaña Atributos_4
+        r_atributos_4 = reporte.add_worksheet('ATRIBUTOS_4')
+        r_atributos_4.set_column('A:A', 6)
+        r_atributos_4.set_column('B:B', 25)
+        r_atributos_4.set_column('C:C', 30)
+        r_atributos_4.set_column('D:D', 50)
+        r_atributos_4.set_column('E:E', 15)
+        r_atributos_4.set_column('F:F', 50)
+        r_atributos_4.set_column('G:G', 10)
+        r_atributos_4.set_column('H:H', 15)
+        r_atributos_4.set_column('I:I', 15)
+        r_atributos_4.set_column('J:J', 15)
+        r_atributos_4.set_column('K:K', 25)
+        r_atributos_4.set_column('L:L', 25)
 
-                for c in dfA_4.columns:
-                    r_atributos_4.write(row, col, c, text_bold)
-                    col += 1
+        r_atributos_4.merge_range('A1:H1', 'ATRIBUTOS DE ELEMENTOS MEP', text_bold)
+        attri_4 = []
+        entiflow = Ifc.by_type('IfcDistributionElement')
+        for e in entiflow:
+            attri_4.append(e.get_info())
+        dfAtri_4 = pd.DataFrame(attri_4).drop_duplicates()
+        if len(dfAtri_4) > 0:
+            dfA_4 = dfAtri_4.drop(columns=['OwnerHistory', 'ObjectPlacement', 'Representation'], axis=1)
+            dfA_4 = dfA_4.fillna(value='No disponible')
+            row = 1
+            col = 0
 
+            for c in dfA_4.columns:
+                r_atributos_4.write(row, col, c, text_bold)
+                col += 1
+
+            row = 2
+            col = 0
+            x = 0
+            while x in range(len(dfA_4.columns)):
+                for i in range(len(dfA_4)):
+                    r_atributos_4.write(row, col, dfA_4.iloc[i, x], data_text)
+                    row += 1
                 row = 2
-                col = 0
-                x = 0
-                while x in range(len(dfA_4.columns)):
-                    for i in range(len(dfA_4)):
-                        r_atributos_4.write(row, col, dfA_4.iloc[i, x], data_text)
-                        row += 1
-                    row = 2
-                    x += 1
-                    col += 1
-            else:
-                row = 1
-                col = 0
-                r_atributos_4.write(row, col, 'Este proyecto no contiene elementos MEP.', data_text)
+                x += 1
+                col += 1
+        else:
+            row = 1
+            col = 0
+            r_atributos_4.write(row, col, 'Este proyecto no contiene elementos MEP.', data_text)
+
+        print('Información de Atributos_4 ingresada')
 
         # Crear pestaña Atributos_5
         r_atributos_5 = reporte.add_worksheet('ATRIBUTOS_5')
@@ -544,6 +555,8 @@ class ArchIfc:
             row = 1
             col = 0
             r_atributos_5.write(row, col, 'Este proyecto no contiene mobiliario ni elementos secundarios.', data_text)
+        print('Información de Atributos_5 ingresada')
+
 
         # Crear pestaña Atributos_6
         r_atributos_6 = reporte.add_worksheet('ATRIBUTOS_6')
@@ -591,6 +604,8 @@ class ArchIfc:
             row = 1
             col = 0
             r_atributos_6.write(row, col, 'Este proyecto no contiene espacios ni zonas.', data_text)
+        print('Información de Atributos_6 ingresada')
+
 
         # Crear pestaña Atributos_7
         r_atributos_7 = reporte.add_worksheet('ATRIBUTOS_7')
@@ -638,7 +653,7 @@ class ArchIfc:
             row = 1
             col = 0
             r_atributos_7.write(row, col, 'Este proyecto no contiene Elementos civiles ni geográficos.', data_text)
-
+        print('Información de Atributos_7 ingresada')
 
         # Crear pestaña Propiedades
         r_propiedades = reporte.add_worksheet('PROPIEDADES')
@@ -687,6 +702,8 @@ class ArchIfc:
             r_propiedades.write(row, col+5, v, data_text)
             row +=1
 
+        print('Información de Propiedades ingresada')
+
         # Crear pestaña Cuantías
         r_cuantias = reporte.add_worksheet('CUANTÍAS')
         r_cuantias.set_column('A:A', 25)
@@ -723,6 +740,8 @@ class ArchIfc:
             r_cuantias.write(row, col+4, v, data_text)
             row +=1
 
+        print('Información de Cuantías ingresada')
+        print('Finalizando la creación del reporte...')
         reporte.close()
         nom_modelo = ''.join(x for x in proy.Name if x.isalnum())
         nombre_repo = (nom_modelo + '_reporte.xlsx')
