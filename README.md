@@ -16,7 +16,8 @@ La hoja de cálculo generada contiene instrucciones para facilitar la comprensi�
 
 - 0.1
   - Versión Beta lanzada para realizar pruebas
- -0.2
+  
+- 0.2
   - Mejoras a versión Beta
   
 # Meta
