@@ -62,7 +62,7 @@ class Ui_MainWin(object):
         self.marco.setFrameShadow(QtWidgets.QFrame.Raised)
         self.marco.setObjectName("marco")
         self.tituloApp = QtWidgets.QLabel(self.marco)
-        self.tituloApp.setGeometry(QtCore.QRect(10, 30, 761, 71))
+        self.tituloApp.setGeometry(QtCore.QRect(0, 30, 800, 70))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(30)
@@ -71,7 +71,7 @@ class Ui_MainWin(object):
         self.tituloApp.setAlignment(QtCore.Qt.AlignCenter)
         self.tituloApp.setObjectName("tituloApp")
         self.botCargar = QtWidgets.QPushButton(self.marco)
-        self.botCargar.setGeometry(QtCore.QRect(180, 240, 171, 51))
+        self.botCargar.setGeometry(QtCore.QRect(210, 240, 171, 51))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
@@ -93,7 +93,7 @@ class Ui_MainWin(object):
                                      "}")
         self.botCargar.setObjectName("botCargar")
         self.botReport = QtWidgets.QPushButton(self.marco)
-        self.botReport.setGeometry(QtCore.QRect(430, 240, 171, 51))
+        self.botReport.setGeometry(QtCore.QRect(420, 240, 171, 51))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(10)
@@ -108,7 +108,7 @@ class Ui_MainWin(object):
         self.botReport.setObjectName("botReport")
         self.botReport.setEnabled(False)
         self.estadoApp = QtWidgets.QLabel(self.marco)
-        self.estadoApp.setGeometry(QtCore.QRect(10, 150, 761, 71))
+        self.estadoApp.setGeometry(QtCore.QRect(0, 150, 800, 75))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(12)
@@ -117,9 +117,8 @@ class Ui_MainWin(object):
         self.estadoApp.setAlignment(QtCore.Qt.AlignCenter)
         self.estadoApp.setObjectName("estadoApp")
         self.autorApp = QtWidgets.QLabel(self.marco)
-        self.autorApp.setGeometry(QtCore.QRect(10, 110, 761, 21))
+        self.autorApp.setGeometry(QtCore.QRect(0, 110, 800, 25))
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
         font.setPointSize(8)
         self.autorApp.setFont(font)
         self.autorApp.setStyleSheet("color: rgb(174, 181, 191);")
@@ -221,8 +220,9 @@ class Ui_MainWin(object):
         self.botCargar.setStyleSheet("background-color: rgb(166, 166, 166);\n"
 "border-radius: 10px;\n"
 "color: rgb(60, 47, 69);")
-        self.worker.finished.connect(self.reporte_cread)
         self.worker.problem.connect(self.er)
+        self.worker.completed.connect(self.reporte_cread)
+
 
     def reporte_cread(self):
         self.estadoApp.setText('Reporte creado!')
@@ -278,8 +278,8 @@ class Ui_MainWin(object):
         return ai
 
     def er(self, str):
-        self.estadoApp.setText('No se pudo crear el informe')
-        self.resumenIfc.setText(str)
+        self.estadoApp.setText(str)
+        self.resumenIfc.setText('(✖╭╮✖)')
         print('Error!')
         error_dialog = QtWidgets.QMessageBox()
         error_dialog.setIcon(QtWidgets.QMessageBox.Critical)
@@ -287,11 +287,27 @@ class Ui_MainWin(object):
         error_dialog.setWindowTitle('Error')
         error_dialog.setInformativeText(str)
         error_dialog.exec_()
-        logger.exception('Error al crear el reporte!')
+        logger.exception(str)
+        self.botCargar.setEnabled(True)
+        self.botReport.setEnabled(False)
+        self.botCargar.setStyleSheet("QPushButton {\n"
+                                     "    background-color: rgb(222, 159, 50);\n"
+                                     "    border-radius: 10px;\n"
+                                     "    color: rgb(60, 47, 69);\n"
+                                     "}\n"
+                                     "QPushButton:hover {\n"
+                                     "    background-color: rgb(90, 47, 69);\n"
+                                     "    color: rgb(222, 159, 50);\n"
+                                     "}\n"
+                                     "QPushButton:pressed {\n"
+                                     "    background-color: rgb(255, 183, 57);\n"
+                                     "    color: rgb(60, 47, 69);\n"
+                                     "}")
 
 
 class WorkerThread_1(QThread):
     problem = pyqtSignal(str)
+    completed = pyqtSignal(str)
 
     def run(self):
         global ai
@@ -300,7 +316,10 @@ class WorkerThread_1(QThread):
             ai.crear_repo(ai.Ifc)
 
         except Exception:
-            self.problem.emit('Error al crear el reporte')
+            self.problem.emit('Error al crear el reporte.')
+            logger.exception('Error al crear el reporte.')
+        else:
+            self.completed.emit('Reporte creado con éxito!')
 
 
 class WorkerThread_2(QThread):
@@ -317,7 +336,7 @@ class WorkerThread_2(QThread):
                 archi = ai.Ifc
             except Exception:
                 self.problem.emit('Error al cargar el archivo.')
-                logger.exception('Error al cargar el archivo!')
+                logger.exception('Error al cargar el archivo.!')
             else:
                 dire = Path(path)
                 self.worker_complete.emit(dire)
